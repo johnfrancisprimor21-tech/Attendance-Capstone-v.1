@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Attendance - PIN Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="pin-auth.css">
+</head>
+<body>
+    <div class="pin-container">
+        <!-- Left Section - Branding -->
+        <div class="pin-branding">
+            <div class="branding-content">
+                <div class="logo-circle">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h1>Attendance System</h1>
+                <p>Secure PIN-Based Access</p>
+                <div class="features">
+                    <div class="feature-item">
+                        <i class="fas fa-lock"></i>
+                        <span>Secure Authentication</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-users"></i>
+                        <span>Student Management</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Attendance Tracking</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section - Forms -->
+        <div class="pin-forms-container">
+            <!-- Mode Toggle -->
+            <div class="mode-toggle">
+                <button class="toggle-btn active" data-mode="login" onclick="switchMode('login')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <button class="toggle-btn" data-mode="setup" onclick="switchMode('setup')">
+                    <i class="fas fa-gear"></i> Setup PIN
+                </button>
+            </div>
+
+            <!-- Login Mode -->
+            <div id="loginMode" class="form-mode active">
+                <div class="form-header">
+                    <h2>Enter Your PIN</h2>
+                    <p>Secure access to the attendance system</p>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="pin-input-group">
+                        <div class="pin-display">
+                            <div id="pinDisplay" class="pin-dots">
+                                <span class="pin-dot"></span>
+                                <span class="pin-dot"></span>
+                                <span class="pin-dot"></span>
+                                <span class="pin-dot"></span>
+                            </div>
+                        </div>
+
+                        <input 
+                            type="password" 
+                            id="loginPin" 
+                            class="pin-input hidden" 
+                            placeholder="Enter PIN" 
+                            maxlength="4"
+                            inputmode="numeric"
+                            pattern="[0-9]{4}"
+                            required
+                        >
+
+                        <div class="keypad">
+                            <div class="keypad-row">
+                                <button type="button" class="key-btn" onclick="appendPin('1')">1</button>
+                                <button type="button" class="key-btn" onclick="appendPin('2')">2</button>
+                                <button type="button" class="key-btn" onclick="appendPin('3')">3</button>
+                            </div>
+                            <div class="keypad-row">
+                                <button type="button" class="key-btn" onclick="appendPin('4')">4</button>
+                                <button type="button" class="key-btn" onclick="appendPin('5')">5</button>
+                                <button type="button" class="key-btn" onclick="appendPin('6')">6</button>
+                            </div>
+                            <div class="keypad-row">
+                                <button type="button" class="key-btn" onclick="appendPin('7')">7</button>
+                                <button type="button" class="key-btn" onclick="appendPin('8')">8</button>
+                                <button type="button" class="key-btn" onclick="appendPin('9')">9</button>
+                            </div>
+                            <div class="keypad-row">
+                                <button type="button" class="key-btn delete" onclick="deletePin()">
+                                    <i class="fas fa-backspace"></i>
+                                </button>
+                                <button type="button" class="key-btn" onclick="appendPin('0')">0</button>
+                                <button type="button" class="key-btn clear" onclick="clearPin()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary full-width">
+                        <i class="fas fa-lock-open"></i> Unlock
+                    </button>
+
+                    <div class="forgotten-pin">
+                        <button type="button" class="link-btn" onclick="resetPin()">
+                            <i class="fas fa-key"></i> Forgot PIN?
+                        </button>
+                    </div>
+                </form>
+
+                <div id="loginError" class="error-message"></div>
+                <div id="loginSuccess" class="success-message"></div>
+            </div>
+
+            <!-- Setup PIN Mode -->
+            <div id="setupMode" class="form-mode">
+                <div class="form-header">
+                    <h2>Create Your PIN</h2>
+                    <p>Set up a secure 4-digit PIN</p>
+                </div>
+
+                <div class="setup-steps">
+                    <div class="step active" id="step1">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Enter PIN</span>
+                    </div>
+                    <div class="step" id="step2">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Confirm PIN</span>
+                    </div>
+                </div>
+
+                <form id="setupForm" onsubmit="handleSetup(event)">
+                    <!-- Step 1: Enter PIN -->
+                    <div id="setupStep1" class="setup-step active">
+                        <div class="pin-input-group">
+                            <label class="form-label">Enter a 4-digit PIN</label>
+                            <div class="pin-display">
+                                <div id="setupPin1Display" class="pin-dots">
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                </div>
+                            </div>
+
+                            <input 
+                                type="password" 
+                                id="setupPin1" 
+                                class="pin-input hidden" 
+                                maxlength="4"
+                                inputmode="numeric"
+                                pattern="[0-9]{4}"
+                                required
+                            >
+
+                            <div class="keypad">
+                                <div class="keypad-row">
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('1', 'step1')">1</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('2', 'step1')">2</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('3', 'step1')">3</button>
+                                </div>
+                                <div class="keypad-row">
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('4', 'step1')">4</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('5', 'step1')">5</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('6', 'step1')">6</button>
+                                </div>
+                                <div class="keypad-row">
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('7', 'step1')">7</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('8', 'step1')">8</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('9', 'step1')">9</button>
+                                </div>
+                                <div class="keypad-row">
+                                    <button type="button" class="key-btn delete" onclick="deleteSetupPin('step1')">
+                                        <i class="fas fa-backspace"></i>
+                                    </button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('0', 'step1')">0</button>
+                                    <button type="button" class="key-btn clear" onclick="clearSetupPin('step1')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary full-width next-btn" onclick="moveToStep2()">
+                                <i class="fas fa-arrow-right"></i> Next
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Confirm PIN -->
+                    <div id="setupStep2" class="setup-step">
+                        <div class="pin-input-group">
+                            <label class="form-label">Confirm Your PIN</label>
+                            <div class="pin-display">
+                                <div id="setupPin2Display" class="pin-dots">
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                    <span class="pin-dot"></span>
+                                </div>
+                            </div>
+
+                            <input 
+                                type="password" 
+                                id="setupPin2" 
+                                class="pin-input hidden" 
+                                maxlength="4"
+                                inputmode="numeric"
+                                pattern="[0-9]{4}"
+                                required
+                            >
+
+                            <div class="keypad">
+                                <div class="keypad-row">
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('1', 'step2')">1</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('2', 'step2')">2</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('3', 'step2')">3</button>
+                                </div>
+                                <div class="keypad-row">
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('4', 'step2')">4</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('5', 'step2')">5</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('6', 'step2')">6</button>
+                                </div>
+                                <div class="keypad-row">
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('7', 'step2')">7</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('8', 'step2')">8</button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('9', 'step2')">9</button>
+                                </div>
+                                <div class="keypad-row">
+                                    <button type="button" class="key-btn delete" onclick="deleteSetupPin('step2')">
+                                        <i class="fas fa-backspace"></i>
+                                    </button>
+                                    <button type="button" class="key-btn" onclick="appendSetupPin('0', 'step2')">0</button>
+                                    <button type="button" class="key-btn clear" onclick="clearSetupPin('step2')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="button-group full-width">
+                                <button type="button" class="btn btn-secondary" onclick="backToStep1()">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-check"></i> Create PIN
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="setupError" class="error-message"></div>
+                <div id="setupSuccess" class="success-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+    <script src="js/config.json"></script>
+    <script src="js/api-client.js"></script>
+    <script src="pin-auth.js"></script>
+</body>
+</html>
